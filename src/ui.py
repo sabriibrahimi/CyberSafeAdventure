@@ -372,7 +372,7 @@ class UI:
         pygame.draw.rect(screen, RED, (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), border_thickness)
 
     # Trivia Popup drawing
-    def draw_trivia_popup(self, screen, question_data, selected_option=None):
+    def draw_trivia_popup(self, screen, question_data, selected_option=None, enemy_type=None):
         overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         overlay.set_alpha(220)
         overlay.fill(BLACK)
@@ -383,17 +383,35 @@ class UI:
         box_x = (SCREEN_WIDTH - box_width) // 2
         box_y = (SCREEN_HEIGHT - box_height) // 2
 
-        # Draw Question Box
+        # Draw Question Box - Background
         # pygame.draw.rect(screen, DARK_GRAY, (box_x, box_y, box_width, box_height))
-        # pygame.draw.rect(screen, BLUE, (box_x, box_y, box_width, box_height), 3)
-
-        self.draw_text(screen, "CYBER SAFETY QUIZ", box_x + box_width//2 - 100, box_y + 20, self.font_large, CYAN)
+        
+        y_offset = 20
+        # If triggered by known enemy, show warning first
+        if enemy_type:
+            warn_color = RED
+            warn_text = f"You touched a {enemy_type.upper()}!"
+            if enemy_type == "phishing": warn_color = BLUE
+            elif enemy_type == "malware": warn_color = GREEN
+            elif enemy_type == "stranger": warn_color = PURPLE
+            
+            warn_width = self.font_large.size(warn_text)[0]
+            self.draw_text(screen, warn_text, box_x + (box_width - warn_width)//2, box_y + y_offset, self.font_large, warn_color)
+            
+            y_offset += 50
+            sub_text = "Answer correctly to defend yourself!"
+            sub_width = self.font_small.size(sub_text)[0]
+            self.draw_text(screen, sub_text, box_x + (box_width - sub_width)//2, box_y + y_offset, self.font_small, WHITE)
+            y_offset += 40
+        else:
+            self.draw_text(screen, "CYBER SAFETY QUIZ", box_x + box_width//2 - 100, box_y + y_offset, self.font_large, CYAN)
+            y_offset += 60
         
         question_lines = self.wrap_text(question_data["question"], box_width - 40, self.font_medium)
         for i, line in enumerate(question_lines):
-            self.draw_text(screen, line, box_x + 20, box_y + 80 + i*30, self.font_medium, WHITE)
+            self.draw_text(screen, line, box_x + 20, box_y + y_offset + i*30, self.font_medium, WHITE)
 
-        option_start_y = box_y + 180
+        option_start_y = box_y + y_offset + len(question_lines)*30 + 30
         option_rects = []
         
         labels = ["a", "b", "c"]
@@ -505,3 +523,90 @@ class UI:
         self.draw_text(screen, back_text, back_x + (back_width - text_width) // 2, back_y + 12, self.font_medium, BLACK)
         
         return {'back': back_rect}
+
+    def draw_password_challenge(self, screen, input_text, feedback_text, strength_level):
+        screen.fill((10, 10, 20)) # Very dark blue background
+        
+        # Title
+        title_text = "LEVEL 1 SECURITY CHECK"
+        title_width = self.font_huge.size(title_text)[0]
+        self.draw_text(screen, title_text, (SCREEN_WIDTH - title_width) // 2, 40, self.font_huge, GREEN)
+        
+        # Educational Text Panel
+        panel_rect = pygame.Rect(100, 100, SCREEN_WIDTH - 200, 280)
+        pygame.draw.rect(screen, (30, 30, 40), panel_rect, border_radius=10)
+        pygame.draw.rect(screen, CYAN, panel_rect, 2, border_radius=10)
+        
+        info_lines = [
+            ("PASSWORD SECURITY TRAINING", CYAN),
+            ("", WHITE),
+            ("WEAK: '123456', 'password', 'sabri' (Instantly hackable)", RED),
+            ("MEDIUM: 'MyDogRex1', 'Soccer20' (Cracked in minutes)", ORANGE),
+            ("STRONG: 'Trov!8#Z2', 'K$m9Lp@1' (Takes centuries to crack)", GREEN),
+            ("", WHITE),
+            ("MISSION: Create a STRONG password (8+ chars, mix case, numbers, symbols)", YELLOW)
+        ]
+        
+        start_y = 120
+        for text, color in info_lines:
+            text_width = self.font_medium.size(text)[0]
+            self.draw_text(screen, text, (SCREEN_WIDTH - text_width) // 2, start_y, self.font_medium, color)
+            start_y += 35
+            
+        # Input Box Area
+        input_box_width = 500
+        input_box_height = 60
+        input_x = (SCREEN_WIDTH - input_box_width) // 2
+        input_y = 420
+        
+        # Dynamic Border Color based on strength
+        border_color = WHITE
+        status_icon = "..."
+        if strength_level == "STRONG": 
+            border_color = GREEN
+            status_icon = "✔ SECURE"
+        elif strength_level == "MEDIUM": 
+            border_color = ORANGE
+            status_icon = "⚠ WEAK"
+        elif strength_level == "WEAK": 
+            border_color = RED
+            status_icon = "❌ VULNERABLE"
+            
+        # Draw Box
+        pygame.draw.rect(screen, (0, 0, 0), (input_x, input_y, input_box_width, input_box_height))
+        pygame.draw.rect(screen, border_color, (input_x, input_y, input_box_width, input_box_height), 3)
+        
+        # Draw typed text (masked slightly for realism? No, user needs to see it to learn)
+        text_surface = self.font_large.render(input_text, True, WHITE)
+        screen.blit(text_surface, (input_x + 15, input_y + 12))
+        
+        # Blinking Cursor
+        if (pygame.time.get_ticks() // 500) % 2 == 0:
+            cursor_x = input_x + 15 + text_surface.get_width()
+            pygame.draw.line(screen, WHITE, (cursor_x, input_y + 10), (cursor_x, input_y + 50), 2)
+        
+        # Feedback Text
+        if feedback_text:
+            feed_text = f"ANALYSIS: {feedback_text}"
+            feed_width = self.font_medium.size(feed_text)[0]
+            
+            # Choose color based on strength
+            feed_color = WHITE
+            if strength_level == "WEAK": feed_color = RED
+            elif strength_level == "MEDIUM": feed_color = ORANGE
+            elif strength_level == "STRONG": feed_color = GREEN
+            
+            self.draw_text(screen, feed_text, (SCREEN_WIDTH - feed_width) // 2, input_y + 80, self.font_medium, feed_color)
+            
+        # Strength Indicator
+        strength_text = f"STATUS: {status_icon}"
+        strength_width = self.font_medium.size(strength_text)[0]
+        self.draw_text(screen, strength_text, (SCREEN_WIDTH - strength_width) // 2, input_y - 40, self.font_medium, border_color)
+
+        if strength_level == "STRONG":
+            cont_text = "ACCESS GRANTED - PRESS ENTER TO PROCEED"
+            cont_bg = pygame.Rect(0, 550, SCREEN_WIDTH, 50)
+            pygame.draw.rect(screen, (0, 50, 0), cont_bg)
+            
+            cont_width = self.font_large.size(cont_text)[0]
+            self.draw_text(screen, cont_text, (SCREEN_WIDTH - cont_width) // 2, 560, self.font_large, GREEN)

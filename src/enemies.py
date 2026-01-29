@@ -11,10 +11,10 @@ class Enemy(pygame.sprite.Sprite):
         self.height = 35
         
         colors = {
-            "virus": RED,
-            "phishing": ORANGE,
-            "stranger": PURPLE,
-            "malware": (255, 50, 50)
+            "virus": RED,           # Red Spikes
+            "phishing": BLUE,       # Blue Spikes
+            "stranger": PURPLE,     # Purple Spikes
+            "malware": GREEN        # Green Spikes
         }
         
         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)

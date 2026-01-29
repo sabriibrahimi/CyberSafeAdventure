@@ -62,6 +62,14 @@ class CyberSafeGame:
         
         self.game_paused = False
         
+        self.in_password_challenge = False
+        self.password_input = ""
+        self.password_feedback = ""
+        self.password_strength = ""
+        
+        self.collided_enemy_type = None
+        self.enemy_info_active = False
+        self.floating_texts = [] # List of {'text': str, 'x': int, 'y': int, 'color': tuple, 'timer': int}
         self.ui = UI()
         
         self.init_level()
@@ -154,10 +162,10 @@ class CyberSafeGame:
     def spawn_enemies(self):
         enemies_to_introduce = []
         
-        SPEED_SLOW = 1.2
-        SPEED_NORMAL = 2.0
-        SPEED_FAST_L4 = 2.25
-        SPEED_FAST_L5 = 2.4
+        SPEED_SLOW = 1.0
+        SPEED_NORMAL = 1.5
+        SPEED_FAST_L4 = 2.0
+        SPEED_FAST_L5 = 2.2
 
         if self.current_level == 1:
 
@@ -171,15 +179,15 @@ class CyberSafeGame:
             
         elif self.current_level == 2:
 
-            self.enemies.add(Enemy(125, 515, "phishing", behavior="patrol", speed=SPEED_SLOW))
+            self.enemies.add(Enemy(125, 515, "virus", behavior="patrol", speed=SPEED_SLOW))
             self.enemies.add(Enemy(425, 365, "phishing", behavior="patrol", speed=SPEED_SLOW))
-            self.enemies.add(Enemy(725, 465, "phishing", behavior="patrol", speed=SPEED_SLOW))
+            self.enemies.add(Enemy(725, 465, "malware", behavior="patrol", speed=SPEED_SLOW))
             
             # Ground (4)
-            self.enemies.add(Enemy(200, SCREEN_HEIGHT - 90, "phishing", behavior="chase", speed=SPEED_NORMAL))
+            self.enemies.add(Enemy(200, SCREEN_HEIGHT - 90, "stranger", behavior="chase", speed=SPEED_NORMAL))
             self.enemies.add(Enemy(400, SCREEN_HEIGHT - 90, "phishing", behavior="chase", speed=SPEED_NORMAL))
-            self.enemies.add(Enemy(600, SCREEN_HEIGHT - 90, "phishing", behavior="chase", speed=SPEED_NORMAL))
-            self.enemies.add(Enemy(800, SCREEN_HEIGHT - 90, "phishing", behavior="chase", speed=SPEED_NORMAL))
+            self.enemies.add(Enemy(600, SCREEN_HEIGHT - 90, "virus", behavior="chase", speed=SPEED_NORMAL))
+            self.enemies.add(Enemy(800, SCREEN_HEIGHT - 90, "stranger", behavior="chase", speed=SPEED_NORMAL))
 
         elif self.current_level == 3:
 
@@ -318,6 +326,29 @@ class CyberSafeGame:
     
     def handle_events(self):
         for event in pygame.event.get():
+            # KEY FIX: The password challenge input must be checked HERE,
+            # as a primary event handler, before other checks.
+            if self.in_password_challenge:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        if self.password_strength == "STRONG":
+                            # Proceed to Level 2
+                            self.in_password_challenge = False
+                            self.current_level = 2
+                            self.score += 100
+                            self.init_level()
+                    elif event.key == pygame.K_BACKSPACE:
+                        self.password_input = self.password_input[:-1]
+                    else:
+                        if len(self.password_input) < 20: # Limit length
+                            # Allow standard characters
+                            if event.unicode.isprintable():
+                                self.password_input += event.unicode
+                    
+                    # Check strength on every keystroke
+                    self.check_password_strength()
+                continue
+
             if event.type == pygame.QUIT:
                 self.running = False
             
@@ -339,12 +370,10 @@ class CyberSafeGame:
                             self.in_menu = False
                             self.in_tips = True
                             
-                    elif self.in_tips:
-                        if 'back' in self.menu_buttons and self.menu_buttons['back'].collidepoint(mouse_pos):
                             self.in_tips = False
                             self.in_menu = True
 
-            # Trivia Input Handling (single question or boss-question sequence)
+            # Trivia Input Handling ( question or boss-question sequence)
             if self.trivia_active:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -352,33 +381,31 @@ class CyberSafeGame:
                     elif event.key == pygame.K_DOWN:
                         self.selected_option = (self.selected_option + 1) % 3
                     elif event.key == pygame.K_RETURN:
-                        # If we're in a boss question sequence, handle progression through 3 questions
                         if self.question_sequence_active:
-                            # Check current answer
                             if self.selected_option == self.current_question["correct"]:
                                 self.question_sequence_correct += 1
                             self.question_sequence_index += 1
-                            # Advance or finish sequence
                             if self.question_sequence_index < len(self.question_sequence):
                                 self.current_question = self.question_sequence[self.question_sequence_index]
                                 self.selected_option = 0
                             else:
-                                # Sequence finished — evaluate results
+                              
                                 self.trivia_active = False
                                 self.game_paused = False
                                 self.question_sequence_active = False
                                 correct = self.question_sequence_correct
-                                # 3 correct: damage boss by 34 HP and heal player
+                               
                                 if correct == 3:
                                     if self.boss and self.boss_spawned:
                                         self.boss.take_damage(34)
                                     self.player.heal(15)
-                                # 2 correct: no damage, player must find another block
-                                # 0-1 correct: optional small penalty (knockback)
+                                    self.spawn_floating_text("+15 HP", self.player.rect.centerx, self.player.rect.top - 20, GREEN)
+                              
                                 if correct <= 1:
-                                    # small penalty: minor damage and knockback
+                                   
                                     try:
                                         self.player.take_damage(5)
+                                        self.spawn_floating_text("-5 HP", self.player.rect.centerx, self.player.rect.top - 20, RED)
                                     except Exception:
                                         pass
                                 # Start respawn timer for next block
@@ -398,6 +425,7 @@ class CyberSafeGame:
                                 self.game_paused = False
                                 damage_amount = 15
                                 self.player.take_damage(damage_amount)
+                                self.spawn_floating_text(f"-{damage_amount} HP", self.player.rect.centerx, self.player.rect.top - 20, RED)
                                 self.player.invincible = True
                                 self.player.invincible_timer = 120
                                 if self.player.health <= 0:
@@ -416,6 +444,15 @@ class CyberSafeGame:
                         self.running = False
                 
                 if self.in_menu or self.in_tips:
+                    return
+
+                if self.enemy_info_active:
+                    if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                        # Close Info Box -> Start Trivia
+                        self.enemy_info_active = False
+                        self.trivia_active = True
+                        self.current_question = random.choice(TRIVIA_QUESTIONS)
+                        self.selected_option = 0
                     return
 
                 if event.key == pygame.K_SPACE:
@@ -465,10 +502,12 @@ class CyberSafeGame:
             self.player.stop()
     
     def update(self):
-        if self.in_menu or self.in_tips:
+        if self.in_menu or self.in_tips or self.in_password_challenge or self.enemy_info_active:
             return
 
         if not self.game_over:
+            self.update_floating_texts()
+
             if self.trivia_active:
                 return
 
@@ -566,10 +605,19 @@ class CyberSafeGame:
             if not self.game_paused and not self.player.invincible:
                 enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, False)
                 if enemy_hits:
-                    self.trivia_active = True
-                    self.current_question = random.choice(TRIVIA_QUESTIONS)
-                    self.selected_option = 0
-                    self.game_paused = True
+                    hit_enemy = enemy_hits[0]
+                    self.collided_enemy_type = hit_enemy.enemy_type
+                    
+                    if self.current_level == 2:
+                        # LEVEL 2 EXCLUSIVE: Show Info Box FIRST
+                        self.enemy_info_active = True
+                        self.game_paused = True
+                    else:
+                        # Other Levels: Standard Trivia Trigger
+                        self.trivia_active = True
+                        self.current_question = random.choice(TRIVIA_QUESTIONS)
+                        self.selected_option = 0
+                        self.game_paused = True
                 
                 if self.boss and self.boss_spawned and self.player.rect.colliderect(self.boss.rect):
 
@@ -587,6 +635,7 @@ class CyberSafeGame:
                     self.coins_for_heal += 1
                     if self.coins_for_heal >= 7:
                         self.player.heal(5) # Heals 5 health every 7 coins
+                        self.spawn_floating_text("+5 HP", self.player.rect.centerx, self.player.rect.top - 20, GREEN)
                         self.coins_for_heal = 0
 
             
@@ -604,7 +653,13 @@ class CyberSafeGame:
                     level_complete = True
             
             if level_complete:
-                if self.current_level < self.max_levels:
+                if self.current_level == 1 and not self.in_password_challenge:
+                     # Trigger Password Challenge
+                     self.in_password_challenge = True
+                     self.password_input = ""
+                     self.password_feedback = "Type a password..."
+                     self.password_strength = ""
+                elif self.current_level < self.max_levels and not self.in_password_challenge:
                     self.current_level += 1
                     self.score += 100 * self.current_level
                     self.init_level()
@@ -619,6 +674,14 @@ class CyberSafeGame:
             return
         elif self.in_tips:
             self.menu_buttons = self.ui.draw_tips_screen(self.screen)
+            pygame.display.flip()
+            return
+        elif self.enemy_info_active:
+            self.ui.draw_enemy_introduction(self.screen, self.collided_enemy_type)
+            pygame.display.flip()
+            return
+        elif self.in_password_challenge:
+            self.ui.draw_password_challenge(self.screen, self.password_input, self.password_feedback, self.password_strength)
             pygame.display.flip()
             return
 
@@ -665,6 +728,9 @@ class CyberSafeGame:
             if self.boss and self.boss_spawned:
                 self.ui.draw_boss_health(self.screen, self.boss.health, self.boss.max_health)
             
+            # Draw Floating Texts
+            self.draw_floating_texts()
+
             if self.level_intro_active:
                 self.ui.draw_level_introduction(self.screen, self.current_level, self.level.messages[self.current_level])
             
@@ -683,6 +749,34 @@ class CyberSafeGame:
         
         pygame.display.flip()
     
+    def check_password_strength(self):
+        pwd = self.password_input
+        length = len(pwd)
+        has_upper = any(c.isupper() for c in pwd)
+        has_lower = any(c.islower() for c in pwd)
+        has_digit = any(c.isdigit() for c in pwd)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?/" for c in pwd)
+        
+        strength = 0
+        if length >= 8: strength += 1
+        if has_upper: strength += 1
+        if has_lower: strength += 1
+        if has_digit: strength += 1
+        if has_special: strength += 1
+        
+        if length < 5:
+            self.password_strength = "WEAK"
+            self.password_feedback = "Too short!"
+        elif strength < 3:
+            self.password_strength = "WEAK"
+            self.password_feedback = "Weak: Use numbers, symbols, and mix case."
+        elif strength < 5:
+            self.password_strength = "MEDIUM"
+            self.password_feedback = "Medium: Almost there! Add special chars."
+        else:
+            self.password_strength = "STRONG"
+            self.password_feedback = "Excellent! Strong Password."
+
     def restart_game(self):
         self.game_over = False
         self.won = False
@@ -704,13 +798,42 @@ class CyberSafeGame:
         self.projectiles.empty()
         self.init_level()
     
+    
+    def spawn_floating_text(self, text, x, y, color):
+        self.floating_texts.append({
+            'text': text,
+            'x': x,
+            'y': y,
+            'color': color,
+            'timer': 60 # 1 second duration at 60 FPS
+        })
+
+    def draw_floating_texts(self):
+        for ft in self.floating_texts:
+            text_surf = self.ui.font_medium.render(ft['text'], True, ft['color'])
+            # Add black outline for readability
+            outline_surf = self.ui.font_medium.render(ft['text'], True, BLACK)
+            self.screen.blit(outline_surf, (ft['x'] - 1, ft['y'] - 1))
+            self.screen.blit(outline_surf, (ft['x'] + 1, ft['y'] + 1))
+            self.screen.blit(text_surf, (ft['x'], ft['y']))
+            
+    def update_floating_texts(self):
+        # Update and remove finished texts
+        for ft in self.floating_texts:
+            ft['y'] -= 1 # Float upwards
+            ft['timer'] -= 1
+        self.floating_texts = [ft for ft in self.floating_texts if ft['timer'] > 0]
+
     def run(self):
         while self.running:
             self.handle_events()
             self.handle_input()
             self.update()
             self.draw()
-            self.clock.tick(FPS)
+            try:
+                self.clock.tick(FPS)
+            except KeyboardInterrupt:
+                self.running = False
         
         pygame.quit()
         sys.exit()
