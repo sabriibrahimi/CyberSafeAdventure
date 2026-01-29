@@ -27,7 +27,6 @@ class Enemy(pygame.sprite.Sprite):
         ]
         pygame.draw.polygon(self.image, color, points)
         pygame.draw.polygon(self.image, WHITE, points, 2)
-        # Exclamation mark
         pygame.draw.line(self.image, WHITE, (self.width // 2, 12), (self.width // 2, 20), 2)
         pygame.draw.circle(self.image, WHITE, (self.width // 2, 26), 2)
         
@@ -46,11 +45,9 @@ class Enemy(pygame.sprite.Sprite):
         self.velocity_y = 0
         
         self.damage = 10
-        # Apply global damage reduction so player takes 15% less damage
         try:
             self.damage = int(self.damage * DAMAGE_REDUCTION)
         except NameError:
-            # Fallback if constant isn't available for some reason
             pass
         
     def update(self, platforms, player_pos=None):
@@ -88,12 +85,9 @@ class Enemy(pygame.sprite.Sprite):
                     self.velocity_y = 0
                     on_ground = True
                     
-                    # Only patrol enemies care about edges
                     if self.behavior == "patrol":
-                        # Look ahead point
                         look_ahead_x = self.rect.right + 5 if self.direction > 0 else self.rect.left - 5
                         
-                        # Check if look_ahead point is still on the platform
                         if look_ahead_x > platform.rect.right or look_ahead_x < platform.rect.left:
                             self.direction *= -1
                             # Bump back slightly to prevent getting stuck

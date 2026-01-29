@@ -68,17 +68,16 @@ class Player(pygame.sprite.Sprite):
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
                 if horizontal:
-                    if self.velocity_x > 0:  # Moving right
+                    if self.velocity_x > 0:
                         self.rect.right = platform.rect.left
-                    elif self.velocity_x < 0:  # Moving left
+                    elif self.velocity_x < 0:
                         self.rect.left = platform.rect.right
                 else:
-                    if self.velocity_y > 0:  # Falling
+                    if self.velocity_y > 0:
                         self.rect.bottom = platform.rect.top
                         self.on_ground = True
                         self.velocity_y = 0
-                        # Move with platform if it's moving
-                        if hasattr(platform, 'direction'): # Check if it's a moving platform
+                        if hasattr(platform, 'direction'):
                              if platform.axis == 'x':
                                  self.rect.x += platform.speed * platform.direction
                              elif platform.axis == 'y':

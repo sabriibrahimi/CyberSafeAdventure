@@ -27,6 +27,7 @@ class CyberSafeGame:
         self.menu_buttons = {}
         
         self.current_level = 1
+
         self.max_levels = 5
         self.score = 0
         self.safety_tips_collected = 0
@@ -69,7 +70,15 @@ class CyberSafeGame:
         
         self.collided_enemy_type = None
         self.enemy_info_active = False
-        self.floating_texts = [] # List of {'text': str, 'x': int, 'y': int, 'color': tuple, 'timer': int}
+        self.floating_texts = []
+        
+        self.in_email_sorting = False
+        self.email_list = []
+        self.current_email_index = 0
+        self.emails_sorted_correctly = 0
+        self.email_feedback = ""
+        self.email_feedback_timer = 0
+        
         self.ui = UI()
         
         self.init_level()
@@ -120,7 +129,6 @@ class CyberSafeGame:
         self.all_sprites.add(self.question_blocks)
         
         if self.current_level == 5:
-            # Build question blocks
             self.question_blocks.empty()
             
             if hasattr(self.level, 'question_block_positions') and self.level.question_block_positions:
@@ -129,7 +137,6 @@ class CyberSafeGame:
                     self.question_blocks.add(qb)
                     self.all_sprites.add(qb)
             else:
-                # Fallback implementation for levels without explicit positions
                 platform_candidates = []
                 for plat in self.level.platforms:
                     if plat.rect.width < 60: continue
@@ -144,7 +151,6 @@ class CyberSafeGame:
                     self.question_blocks.add(qb)
                     self.all_sprites.add(qb)
 
-            # Activate one block to start (if any)
             if len(self.question_blocks) > 0:
                 active = random.choice(self.question_blocks.sprites())
                 active.activate()
@@ -152,7 +158,6 @@ class CyberSafeGame:
                 self.block_respawn_timer = 0
                 self.block_respawn_delay = random.randint(120, 240)
 
-            # Spawn boss immediately for level 5 so it appears and chases
             if not self.boss_spawned:
                 self.boss = Boss(SCREEN_WIDTH // 2, 100)
                 self.boss_spawned = True
@@ -196,7 +201,6 @@ class CyberSafeGame:
             self.enemies.add(Enemy(550, 365, "stranger", behavior="patrol", speed=SPEED_SLOW))
             self.enemies.add(Enemy(750, 265, "stranger", behavior="patrol", speed=SPEED_SLOW))
             
-            # Ground (4)
             self.enemies.add(Enemy(300, SCREEN_HEIGHT - 90, "virus", behavior="chase", speed=SPEED_NORMAL))
             self.enemies.add(Enemy(500, SCREEN_HEIGHT - 90, "virus", behavior="chase", speed=SPEED_NORMAL))
             self.enemies.add(Enemy(700, SCREEN_HEIGHT - 90, "virus", behavior="chase", speed=SPEED_NORMAL))
@@ -215,16 +219,13 @@ class CyberSafeGame:
             self.enemies.add(Enemy(800, SCREEN_HEIGHT - 90, "malware", behavior="chase", speed=SPEED_FAST_L4))
             
         elif self.current_level == 5:
-            # Danger Zone 1 (Bottom Platforms y=650)
             self.enemies.add(Enemy(100, 615, "malware", behavior="patrol", speed=SPEED_FAST_L5))
             self.enemies.add(Enemy(600, 615, "malware", behavior="patrol", speed=SPEED_FAST_L5))
             self.enemies.add(Enemy(1000, 615, "malware", behavior="patrol", speed=SPEED_FAST_L5))
             
-            # Danger Zone 2 (Middle Platforms y=350 & Moving)
             self.enemies.add(Enemy(200, 315, "malware", behavior="patrol", speed=SPEED_FAST_L5))
             self.enemies.add(Enemy(950, 315, "malware", behavior="patrol", speed=SPEED_FAST_L5))
             
-            # Ground patrols
             self.enemies.add(Enemy(200, SCREEN_HEIGHT - 90, "malware", behavior="chase", speed=SPEED_FAST_L5))
             self.enemies.add(Enemy(550, SCREEN_HEIGHT - 90, "malware", behavior="chase", speed=SPEED_FAST_L5))
             self.enemies.add(Enemy(900, SCREEN_HEIGHT - 90, "malware", behavior="chase", speed=SPEED_FAST_L5))
@@ -326,8 +327,6 @@ class CyberSafeGame:
     
     def handle_events(self):
         for event in pygame.event.get():
-            # KEY FIX: The password challenge input must be checked HERE,
-            # as a primary event handler, before other checks.
             if self.in_password_challenge:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
@@ -340,12 +339,10 @@ class CyberSafeGame:
                     elif event.key == pygame.K_BACKSPACE:
                         self.password_input = self.password_input[:-1]
                     else:
-                        if len(self.password_input) < 20: # Limit length
-                            # Allow standard characters
+                        if len(self.password_input) < 20:
                             if event.unicode.isprintable():
                                 self.password_input += event.unicode
                     
-                    # Check strength on every keystroke
                     self.check_password_strength()
                 continue
 
@@ -358,14 +355,13 @@ class CyberSafeGame:
                 self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
+                if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     
                     if self.in_menu:
                         if 'start' in self.menu_buttons and self.menu_buttons['start'].collidepoint(mouse_pos):
                             self.in_menu = False
                             self.init_level()
-                            # self.level_intro_active = True # Removed per request
                         elif 'tips' in self.menu_buttons and self.menu_buttons['tips'].collidepoint(mouse_pos):
                             self.in_menu = False
                             self.in_tips = True
@@ -373,7 +369,42 @@ class CyberSafeGame:
                             self.in_tips = False
                             self.in_menu = True
 
-            # Trivia Input Handling ( question or boss-question sequence)
+                            self.check_password_strength()
+                continue
+            
+            if self.in_email_sorting:
+                if event.type == pygame.KEYDOWN:
+                    if self.email_feedback_timer > 0:
+                        pass
+                    else:
+                        current_email = self.email_list[self.current_email_index]
+                        is_phishing = current_email['is_phishing']
+                        correct = False
+                        
+                        if event.key == pygame.K_LEFT:
+                            if is_phishing: correct = True
+                        elif event.key == pygame.K_RIGHT:
+                            if not is_phishing: correct = True
+                        
+                        if correct:
+                            self.emails_sorted_correctly += 1
+                            self.email_feedback = "CORRECT!"
+                            self.spawn_floating_text("CORRECT!", SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 50, GREEN)
+                        else:
+                            self.email_feedback = "WRONG!"
+                            self.spawn_floating_text("WRONG!", SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 50, RED)
+                            self.score -= 50
+                        
+                        self.email_feedback_timer = 30
+                        self.current_email_index += 1
+                        
+                        if self.current_email_index >= len(self.email_list):
+                            pygame.time.delay(500)
+                            self.in_email_sorting = False
+                            self.current_level = 5
+                            self.init_level()
+                continue
+
             if self.trivia_active:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -408,19 +439,17 @@ class CyberSafeGame:
                                         self.spawn_floating_text("-5 HP", self.player.rect.centerx, self.player.rect.top - 20, RED)
                                     except Exception:
                                         pass
-                                # Start respawn timer for next block
                                 self.active_question_block = None
                                 self.block_respawn_timer = random.randint(120, 240)
                                 self.block_respawn_delay = random.randint(120, 240)
                         else:
-                            # Single-question behavior (enemy collision)
                             if self.selected_option == self.current_question["correct"]:
                                 self.trivia_active = False
                                 self.game_paused = False
                                 self.player.invincible = True
                                 self.player.invincible_timer = 120 # 2 seconds
                             else:
-                                # Wrong trivia answer deals a fixed 15 points damage
+
                                 self.trivia_active = False
                                 self.game_paused = False
                                 damage_amount = 15
@@ -448,7 +477,6 @@ class CyberSafeGame:
 
                 if self.enemy_info_active:
                     if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
-                        # Close Info Box -> Start Trivia
                         self.enemy_info_active = False
                         self.trivia_active = True
                         self.current_question = random.choice(TRIVIA_QUESTIONS)
@@ -502,7 +530,12 @@ class CyberSafeGame:
             self.player.stop()
     
     def update(self):
-        if self.in_menu or self.in_tips or self.in_password_challenge or self.enemy_info_active:
+        if self.email_feedback_timer > 0:
+            self.email_feedback_timer -= 1
+            if self.email_feedback_timer == 0:
+                self.email_feedback = ""
+                
+        if self.in_menu or self.in_tips or self.in_password_challenge or self.enemy_info_active or self.in_email_sorting:
             return
 
         if not self.game_over:
@@ -515,35 +548,26 @@ class CyberSafeGame:
                 self.level.platforms.update()
                 self.player.update(self.level.platforms)
             
-                # Boss-level question block handling (respawn/activation & head-hit detection)
                 if self.current_level == 5:
-                    # Respawn logic: if no active block, countdown then activate one
                     if self.active_question_block is None:
                         if self.block_respawn_timer > 0:
                             self.block_respawn_timer -= 1
                         elif self.block_respawn_timer == 0:
-                            # Activate a random inactive block
                             inactive_blocks = [b for b in self.question_blocks if not b.active]
                             if inactive_blocks:
                                 nb = random.choice(inactive_blocks)
                                 nb.activate()
                                 self.active_question_block = nb
                     if not self.question_sequence_active:
-                        # Robust collision detection checking overlaps
                         hit_blocks = pygame.sprite.spritecollide(self.player, self.question_blocks, False)
                         for block in hit_blocks:
                             if block.active:
-                                # Trigger if moving up OR hovering (velocity near 0)
-                                # AND ensuring we aren't landing on top of it (y collision check)
-                                # If player top is roughly below block center, it's a hit from below/side
                                 is_below = self.player.rect.top > block.rect.top
-                                is_moving_up = getattr(self.player, "velocity_y", 0) <= 2 # Allow small positive for "hover"
+                                is_moving_up = getattr(self.player, "velocity_y", 0) <= 2
                                 
                                 if is_below and is_moving_up:
-                                    # Trigger activation
                                     block.deactivate()
                                     self.active_question_block = None
-                                    # Start question sequence (3 questions)
                                     self.question_sequence_active = True
                                     self.question_sequence = random.sample(TRIVIA_QUESTIONS, min(3, len(TRIVIA_QUESTIONS)))
                                     self.question_sequence_index = 0
@@ -552,7 +576,6 @@ class CyberSafeGame:
                                     self.selected_option = 0
                                     self.trivia_active = True
                                     self.game_paused = True
-                                    # set respawn delay to start after sequence finishes
                                     self.block_respawn_delay = random.randint(120, 240)
                                     break
             
@@ -609,11 +632,9 @@ class CyberSafeGame:
                     self.collided_enemy_type = hit_enemy.enemy_type
                     
                     if self.current_level == 2:
-                        # LEVEL 2 EXCLUSIVE: Show Info Box FIRST
                         self.enemy_info_active = True
                         self.game_paused = True
                     else:
-                        # Other Levels: Standard Trivia Trigger
                         self.trivia_active = True
                         self.current_question = random.choice(TRIVIA_QUESTIONS)
                         self.selected_option = 0
@@ -634,7 +655,7 @@ class CyberSafeGame:
                     
                     self.coins_for_heal += 1
                     if self.coins_for_heal >= 7:
-                        self.player.heal(5) # Heals 5 health every 7 coins
+                        self.player.heal(5)
                         self.spawn_floating_text("+5 HP", self.player.rect.centerx, self.player.rect.top - 20, GREEN)
                         self.coins_for_heal = 0
 
@@ -646,7 +667,6 @@ class CyberSafeGame:
                     self.won = True
                     self.score += 500
                 elif len(self.collectibles) == 0:
-                     # Respawn coins in Level 5 if all collected
                      self.spawn_collectibles()
             else:
                 if len(self.collectibles) == 0:
@@ -654,12 +674,17 @@ class CyberSafeGame:
             
             if level_complete:
                 if self.current_level == 1 and not self.in_password_challenge:
-                     # Trigger Password Challenge
                      self.in_password_challenge = True
                      self.password_input = ""
                      self.password_feedback = "Type a password..."
                      self.password_strength = ""
-                elif self.current_level < self.max_levels and not self.in_password_challenge:
+                elif self.current_level == 4 and not self.in_email_sorting:
+                     self.in_email_sorting = True
+                     self.email_list = random.sample(EMAIL_DATA, 5)
+                     self.current_email_index = 0
+                     self.emails_sorted_correctly = 0
+                     self.email_feedback = ""
+                elif self.current_level < self.max_levels and not self.in_password_challenge and not self.in_email_sorting:
                     self.current_level += 1
                     self.score += 100 * self.current_level
                     self.init_level()
@@ -684,8 +709,12 @@ class CyberSafeGame:
             self.ui.draw_password_challenge(self.screen, self.password_input, self.password_feedback, self.password_strength)
             pygame.display.flip()
             return
+        elif self.in_email_sorting:
+            if self.current_email_index < len(self.email_list):
+                self.ui.draw_email_sorting(self.screen, self.email_list[self.current_email_index], len(self.email_list) - self.current_email_index, self.email_feedback)
+            pygame.display.flip()
+            return
 
-        # Level Background Colors
         base_color = (30, 30, 60) # Default Blue-ish
         if self.current_level == 2:
             base_color = (30, 60, 30) # Green-ish
@@ -740,7 +769,6 @@ class CyberSafeGame:
             elif self.boss_warning_active:
                 self.ui.draw_boss_warning(self.screen)
 
-            # Draw Trivia Popup if active
             if self.trivia_active:
                 self.ui.draw_trivia_popup(self.screen, self.current_question, self.selected_option)
 
@@ -791,7 +819,6 @@ class CyberSafeGame:
         self.boss_warning_timer = 0
         self.level_intro_active = False
         self.game_paused = False
-        # Clear all sprites
         self.all_sprites.empty()
         self.enemies.empty()
         self.collectibles.empty()
@@ -805,20 +832,18 @@ class CyberSafeGame:
             'x': x,
             'y': y,
             'color': color,
-            'timer': 60 # 1 second duration at 60 FPS
+            'timer': 60
         })
 
     def draw_floating_texts(self):
         for ft in self.floating_texts:
             text_surf = self.ui.font_medium.render(ft['text'], True, ft['color'])
-            # Add black outline for readability
             outline_surf = self.ui.font_medium.render(ft['text'], True, BLACK)
             self.screen.blit(outline_surf, (ft['x'] - 1, ft['y'] - 1))
             self.screen.blit(outline_surf, (ft['x'] + 1, ft['y'] + 1))
             self.screen.blit(text_surf, (ft['x'], ft['y']))
             
     def update_floating_texts(self):
-        # Update and remove finished texts
         for ft in self.floating_texts:
             ft['y'] -= 1 # Float upwards
             ft['timer'] -= 1

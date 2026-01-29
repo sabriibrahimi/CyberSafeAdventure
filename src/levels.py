@@ -125,7 +125,6 @@ class Level:
             self.platforms.add(Platform(500, 400, 150, 20))
             self.platforms.add(Platform(700, 300, 150, 20))
             
-            # Vertical movers
             self.platforms.add(MovingPlatform(900, 200, 80, 20, 100, 'y', 2))
             self.platforms.add(Platform(600, 150, 80, 20))
             self.platforms.add(Platform(300, 150, 80, 20))
@@ -150,10 +149,7 @@ class Level:
             self.platforms.add(Platform(900, 300, 100, 20))
 
         else:
-            # Level 5: The Maze - Final Challenge
-            
-            # --- TIER 1 & 2: DANGER ZONES (Enemies will be here) ---
-            # Wide platforms for enemies to patrol
+
             self.platforms.add(Platform(50, 650, 300, 20))
             self.platforms.add(Platform(450, 650, 300, 20))
             self.platforms.add(Platform(850, 650, 300, 20))
@@ -164,9 +160,6 @@ class Level:
             self.platforms.add(Platform(100, 350, 250, 20))
             self.platforms.add(Platform(850, 350, 250, 20))
             
-            # --- TIER 3: SAFE ZONES (For Boxes) ---
-            # Small, high platforms reachable by jumping, where boxes will be placed
-            # Enemies won't spawn here.
             self.platforms.add(Platform(500, 250, 200, 20))  # Central safe hub
             
             self.platforms.add(Platform(50, 200, 100, 20))   # Top Left
@@ -175,20 +168,14 @@ class Level:
             self.platforms.add(Platform(300, 150, 100, 20))  # High Left
             self.platforms.add(Platform(800, 150, 100, 20))  # High Right
 
-            # Explicit Question Block Positions (Above the safe platforms)
-            # We place them at specific coordinates so they align perfectly with the safe pads
-            # Adjusted relative to platforms: Platform Y - 100 (reachable jump)
             self.question_block_positions = [
-                (580, 150),  # Above Central hub (500, 250) (250-100=150)
-                (90, 100),   # Above Top Left (50, 200) (200-100=100)
-                (1090, 100), # Above Top Right (1050, 200) (200-100=100)
-                (340, 50),   # Above High Left (300, 150) (150-100=50)
-                (840, 50)    # Above High Right (800, 150) (150-100=50)
+                (580, 150),
+                (90, 100),
+                (1090, 100),
+                (340, 50),
+                (840, 50)
             ]
         
-        # Apply deterministic variations per level so each level differs
-        # slightly from the previous one (positions, widths, moving speeds).
-        # Skip for Level 5 to preserve precise design.
         if self.level_num != 5:
             self.apply_variations()
 
@@ -201,14 +188,11 @@ class Level:
         Uses a Random seeded by level_num for repeatable variations.
         """
         rand = random.Random(self.level_num)
-        # Maximum horizontal shift grows a bit with level (but capped)
         max_shift_x = min(40, 8 * self.level_num)
         max_shift_y = min(25, 5 * self.level_num)
 
         for platform in list(self.platforms):
-            # Save old to reapply after possible image resize
             old_x, old_y = platform.rect.x, platform.rect.y
-            # Random small shifts
             shift_x = rand.randint(-max_shift_x, max_shift_x)
             shift_y = rand.randint(-max_shift_y, max_shift_y)
             new_x = max(0, min(old_x + shift_x, SCREEN_WIDTH - platform.rect.width))
@@ -217,18 +201,14 @@ class Level:
             platform.rect.x = new_x
             platform.rect.y = new_y
 
-            # If it's a moving platform, slightly increase its speed based on level
             if isinstance(platform, MovingPlatform):
                 platform.speed = max(0.5, platform.speed + (self.level_num * 0.15))
 
-            # Don't resize the main ground platform
             if platform.rect.width < SCREEN_WIDTH - 10:
-                # Slight width variation for more layout diversity
                 delta_w = rand.randint(-20, 20)
                 new_width = max(40, min(platform.rect.width + delta_w, SCREEN_WIDTH - platform.rect.x))
                 if new_width != platform.rect.width:
                     height = platform.rect.height
-                    # Recreate the image with the new width and redraw visuals
                     platform.image = pygame.Surface((new_width, height))
                     platform.image.fill(DARK_GRAY)
                     pygame.draw.rect(platform.image, GRAY, (0, 0, new_width, height), 2)
@@ -236,7 +216,6 @@ class Level:
                         pygame.draw.line(platform.image, (50, 50, 50), (i, 0), (i, height), 1)
                     if isinstance(platform, MovingPlatform):
                         pygame.draw.rect(platform.image, YELLOW, (0, 0, new_width, height), 2)
-                    # Reset rect while preserving topleft
                     platform.rect = platform.image.get_rect()
                     platform.rect.x = new_x
                     platform.rect.y = new_y

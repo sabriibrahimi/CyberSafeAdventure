@@ -35,7 +35,6 @@ class Boss(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         
-        # Boss stats
         self.health = 100
         self.max_health = 100
         self.speed = 1.2
