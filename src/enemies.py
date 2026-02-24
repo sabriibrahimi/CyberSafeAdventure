@@ -90,7 +90,6 @@ class Enemy(pygame.sprite.Sprite):
                         
                         if look_ahead_x > platform.rect.right or look_ahead_x < platform.rect.left:
                             self.direction *= -1
-                            # Bump back slightly to prevent getting stuck
                             self.rect.x += self.speed * self.direction * 2
 
         if move_x:
