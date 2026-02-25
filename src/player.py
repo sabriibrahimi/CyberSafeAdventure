@@ -26,6 +26,10 @@ class Player(pygame.sprite.Sprite):
         self.max_health = 100
         self.invincible = False
         self.invincible_timer = 0
+        self.glow_timer = 0
+
+    def start_glow(self):
+        self.glow_timer = 120  # Glow for 2 seconds
 
     def update(self, platforms):
         if self.jump_buffer > 0:
@@ -35,6 +39,9 @@ class Player(pygame.sprite.Sprite):
             self.invincible_timer -= 1
             if self.invincible_timer == 0:
                 self.invincible = False
+
+        if self.glow_timer > 0:
+            self.glow_timer -= 1
 
         if not self.on_ground:
             self.velocity_y += GRAVITY

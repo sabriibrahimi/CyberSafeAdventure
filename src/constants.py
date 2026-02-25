@@ -2,18 +2,20 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 FPS = 60
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE = (100, 150, 255)
-GREEN = (100, 255, 100)
-RED = (255, 100, 100)
-YELLOW = (255, 255, 100)
-PURPLE = (200, 100, 255)
-ORANGE = (255, 165, 0)
-GRAY = (128, 128, 128)
-DARK_GRAY = (64, 64, 64)
-LIGHT_GRAY = (200, 200, 200)
-CYAN = (0, 255, 255)
+BLACK = (26, 26, 26)   # Deep Dark Gray
+WHITE = (255, 255, 255) # Pure White
+GREEN = (0, 255, 0)     # Neon Green (Success/Safe)
+RED = (255, 68, 68)     # Vivid Red (Danger/Threat)
+YELLOW = (255, 215, 0)  # Gold/Yellow for coins
+GRAY = (120, 120, 120)  # Gray for obstacles
+DARK_GRAY = (60, 60, 60) # Dark Gray for obstacle volume
+
+# Aliases for mapping old colors to the simplified palette
+BLUE = RED      # Phishing (Danger)
+PURPLE = RED    # Stranger (Danger)
+ORANGE = RED    # Boss/Hazard (Danger)
+CYAN = GREEN    # UI/Positive (Safe)
+LIGHT_GRAY = WHITE
 
 PLAYER_SPEED = 5
 PLAYER_JUMP_STRENGTH = -18

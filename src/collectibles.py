@@ -13,7 +13,7 @@ class Collectible(pygame.sprite.Sprite):
         center_x, center_y = self.width // 2, self.height // 2
         pygame.draw.circle(self.image, YELLOW, (center_x, center_y), 12)
         pygame.draw.circle(self.image, WHITE, (center_x, center_y), 12, 2)
-        pygame.draw.circle(self.image, (200, 200, 0), (center_x, center_y), 8, 1)
+        pygame.draw.circle(self.image, WHITE, (center_x, center_y), 8, 1)
 
         self.rect = self.image.get_rect()
         self.rect.x = x

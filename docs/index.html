@@ -64,7 +64,7 @@ async def custom_site():
     import embed
 
 
-    platform.document.body.style.background = "#7f7f7f"
+    platform.document.body.style.background = "#1a1a1a"
 
     import pygame
 
@@ -120,7 +120,7 @@ async def custom_site():
         total = track.len or 10  # avoid div0
         slot = ux(.060)/ total # 60%
 
-        pygame.draw.rect(screen,(10,10,10),( marginx-ux(10), marginy-uy(10), (total*slot)+ux(20), uy(110) ) )
+        pygame.draw.rect(screen,(51,51,51),( marginx-ux(10), marginy-uy(10), (total*slot)+ux(20), uy(110) ) )
         pygame.draw.rect(screen,(0,255,0), ( marginx, marginy, track.pos*slot, uy(90)) )
 
     # wait until zip mount + overlayfs is complete
@@ -285,7 +285,7 @@ asyncio.run( custom_site() )
             margin-top: 20px;
             margin-left: 30px;
             font-weight: bold;
-            color: rgb(120, 120, 120);
+            color: #ffffff;
         }
 
         #progress {
@@ -328,7 +328,7 @@ asyncio.run( custom_site() )
             font-family: arial;
             margin: 0;
             padding: none;
-            background-color: powderblue;
+            background-color: #1a1a1a;
         }
 
         .topright {

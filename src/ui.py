@@ -83,7 +83,7 @@ class UI:
         y = 90
 
         padding = 10
-        pygame.draw.rect(screen, (100, 0, 0), (x - padding, y - padding, text_width + padding * 2, 40))
+        pygame.draw.rect(screen, BLACK, (x - padding, y - padding, text_width + padding * 2, 40))
         pygame.draw.rect(screen, RED, (x - padding, y - padding, text_width + padding * 2, 40), 2)
 
         self.draw_text(screen, text, x, y, self.font_medium, YELLOW)
@@ -333,7 +333,7 @@ class UI:
 
         overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         overlay.set_alpha(220 if flash else 180)
-        overlay.fill((100, 0, 0))
+        overlay.fill(BLACK)
         screen.blit(overlay, (0, 0))
 
         warning_text1 = "⚠ DANGEROUS INTERNET THREAT DETECTED ⚠"
@@ -360,15 +360,14 @@ class UI:
         pygame.draw.rect(screen, RED, (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), border_thickness)
 
     def draw_trivia_popup(self, screen, question_data, selected_option=None, enemy_type=None):
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-        overlay.set_alpha(220)
-        overlay.fill(BLACK)
-        screen.blit(overlay, (0, 0))
-
-        box_width = 800
-        box_height = 500
+        box_width = 900
+        box_height = 600
         box_x = (SCREEN_WIDTH - box_width) // 2
         box_y = (SCREEN_HEIGHT - box_height) // 2
+
+        # Draw a smaller black background area for the trivia
+        pygame.draw.rect(screen, BLACK, (box_x, box_y, box_width, box_height))
+        pygame.draw.rect(screen, WHITE, (box_x, box_y, box_width, box_height), 4)
 
         y_offset = 20
         if enemy_type:
@@ -413,8 +412,8 @@ class UI:
             y_pos = option_start_y + i * 80
 
             if i == selected_option:
-                pygame.draw.rect(screen, (50, 50, 100), (box_x + 10, y_pos - 10, box_width - 20, 60))
-                pygame.draw.rect(screen, BLUE, (box_x + 10, y_pos - 10, box_width - 20, 60), 2)
+                pygame.draw.rect(screen, BLACK, (box_x + 10, y_pos - 10, box_width - 20, 60))
+                pygame.draw.rect(screen, GREEN, (box_x + 10, y_pos - 10, box_width - 20, 60), 2)
 
             self.draw_text(screen, option_text, box_x + 20, y_pos, self.font_small, color)
 
@@ -519,8 +518,8 @@ class UI:
         self.draw_text(screen, title_text, (SCREEN_WIDTH - title_width) // 2, 40, self.font_huge, GREEN)
 
         panel_rect = pygame.Rect(100, 100, SCREEN_WIDTH - 200, 280)
-        pygame.draw.rect(screen, (30, 30, 40), panel_rect, border_radius=10)
-        pygame.draw.rect(screen, CYAN, panel_rect, 2, border_radius=10)
+        pygame.draw.rect(screen, BLACK, panel_rect, border_radius=10)
+        pygame.draw.rect(screen, GREEN, panel_rect, 2, border_radius=10)
 
         info_lines = [
             ("PASSWORD SECURITY TRAINING", CYAN),
@@ -588,13 +587,13 @@ class UI:
         if strength_level == "STRONG":
             cont_text = "ACCESS GRANTED - PRESS ENTER TO PROCEED"
             cont_bg = pygame.Rect(0, 550, SCREEN_WIDTH, 50)
-            pygame.draw.rect(screen, (0, 50, 0), cont_bg)
+            pygame.draw.rect(screen, BLACK, cont_bg)
 
             cont_width = self.font_large.size(cont_text)[0]
             self.draw_text(screen, cont_text, (SCREEN_WIDTH - cont_width) // 2, 560, self.font_large, GREEN)
 
     def draw_email_sorting(self, screen, email_data, progress, feedback):
-        screen.fill((20, 20, 30))
+        screen.fill(BLACK)
 
         title = "INBOX CLEANER: SORT THE EMAILS"
         title_w = self.font_large.size(title)[0]

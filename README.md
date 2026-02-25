@@ -4,6 +4,17 @@ Cyber Safe Adventure is an educational 2D platformer game built with Python and 
 
 ---
 
+## Recent Visual & Gameplay Updates
+
+The game has recently undergone a major visual overhaul to provide a more professional and focused experience:
+
+- **Simplified Color Palette:** A modern 4-color theme (Dark Gray, Neon Green, White, and Red) is used throughout for a cohesive "cyber" aesthetic.
+- **Enhanced Object Visibility:** Platforms now feature clear Gray borders, and collectible Safety Coins are bright Yellow to stand out against the dark, vertical gradient backgrounds.
+- **Player Glow Feedback:** Correct answers in the trivia sections trigger a radiant visual glow around the player, providing immediate reward feedback.
+- **Floating Workspace UI:** Trivia popups and educational cards are now presented as centered floating windows rather than full-screen blocks, keeping players immersed in the game world.
+
+---
+
 ## Git Repository Page
 
 [https://sabriibrahimi.github.io/CyberSafeAdventure/](https://sabriibrahimi.github.io/CyberSafeAdventure/)
@@ -73,9 +84,9 @@ The password creation screen teaches players what makes a password secure. Visua
 
 Level 2 introduces three new enemy types, each representing a different real-world digital threat. This level is designed to educate players about the variety of dangers they may encounter online.
 
-- **Phishing enemies (Blue):** Represent fake emails and fraudulent websites attempting to steal personal information.
-- **Malware enemies (Green):** Represent harmful software that can damage a device or steal data when accidentally downloaded.
-- **Online Stranger enemies (Purple):** Represent unknown and potentially dangerous contacts online.
+- **Phishing enemies:** Represent fake emails and fraudulent websites attempting to steal personal information.
+- **Malware enemies:** Represent harmful software that can damage a device or steal data when accidentally downloaded.
+- **Online Stranger enemies:** Represent unknown and potentially dangerous contacts online.
 
 A key educational feature introduced in this level is Threat Intelligence. The first time a player touches a new enemy type, the game pauses and displays an Info Card explaining exactly what that type of threat is, how it works in real life, and how to avoid it. After reading the card, the player faces a short trivia question to confirm their understanding before continuing.
 
@@ -175,6 +186,17 @@ Cyber Safe Adventure е едукативна 2D платформерска иг�
 
 ---
 
+## Неодамнешни Визуелни и Игровни Ажурирања
+
+Играта неодамна помина низ голем визуелен ремонт за да обезбеди попрофесионално и пофокусирано искуство:
+
+- **Поедноставена Палета на Бои:** Модерна тема од 4 бои (Темно Сива, Неон Зелена, Бела и Црвена) се користи низ целата игра за кохезивен „сајбер" изглед.
+- **Подобра Видливост на Објектите:** Платформите сега имаат јасни Сиви рабови, а безбедносните монети се светло Жолти за да се истакнат наспроти темните позадини со вертикален градиент.
+- **Ефект на Сјај кај Играчот:** Точните одговори во тривија деловите активираат зрачен визуелен сјај околу играчот, обезбедувајќи моментален повратен одговор за награда.
+- **Лебдечки UI:** Тривија прашањата и едукативните картички сега се прикажуваат како центрирани лебдечки прозорци наместо блокови на цел екран, одржувајќи ги играчите внесени во игровниот свет.
+
+---
+
 ## Страница на Git Репозиториумот
 
 [https://sabriibrahimi.github.io/CyberSafeAdventure/](https://sabriibrahimi.github.io/CyberSafeAdventure/)
@@ -244,9 +266,9 @@ Cyber Safe Adventure е едукативна 2D платформерска иг�
 
 Ниво 2 воведува три нови типови непријатели, секој претставувајќи различна реална дигитална закана. Ова ниво е дизајнирано да ги едуцира играчите за разновидноста на опасностите со кои можат да се сретнат онлајн.
 
-- **Фишинг непријатели (Сини):** Претставуваат лажни имејли и измамнички веб-сајтови кои се обидуваат да украдат лични информации.
-- **Малвер непријатели (Зелени):** Претставуваат штетен софтвер кој може да оштети уред или да украде податоци кога случајно се преземе.
-- **Непријатели - Онлајн Странци (Виолетови):** Претставуваат непознати и потенцијално опасни контакти онлајн.
+- **Фишинг непријатели:** Претставуваат лажни имејли и измамнички веб-сајтови кои се обидуваат да украдат лични информации.
+- **Малвер непријатели:** Претставуваат штетен софтвер кој може да оштети уред или да украде податоци кога случајно се преземе.
+- **Непријатели - Онлајн Странци:** Претставуваат непознати и потенцијално опасни контакти онлајн.
 
 Клучна едукативна функција воведена во ова ниво е Разузнавање на Закани. Кога играчот за прв пат допира нов тип непријател, играта се паузира и прикажува Информативна Картичка со детално објаснување за тоа каква е таа закана, како функционира во реалниот свет и како да се избегне. По читањето на картичката, играчот се соочува со кратко тривија прашање за потврда на разбирањето пред да продолжи.
 

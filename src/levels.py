@@ -9,8 +9,6 @@ class Platform(pygame.sprite.Sprite):
         self.image = pygame.Surface((width, height))
         self.image.fill(DARK_GRAY)
         pygame.draw.rect(self.image, GRAY, (0, 0, width, height), 2)
-        for i in range(0, width, 20):
-            pygame.draw.line(self.image, (50, 50, 50), (i, 0), (i, height), 1)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -216,10 +214,8 @@ class Level:
                     platform.image = pygame.Surface((new_width, height))
                     platform.image.fill(DARK_GRAY)
                     pygame.draw.rect(platform.image, GRAY, (0, 0, new_width, height), 2)
-                    for i in range(0, new_width, 20):
-                        pygame.draw.line(platform.image, (50, 50, 50), (i, 0), (i, height), 1)
                     if isinstance(platform, MovingPlatform):
-                        pygame.draw.rect(platform.image, YELLOW, (0, 0, new_width, height), 2)
+                        pygame.draw.rect(platform.image, GRAY, (0, 0, new_width, height), 2)
                     platform.rect = platform.image.get_rect()
                     platform.rect.x = new_x
                     platform.rect.y = new_y

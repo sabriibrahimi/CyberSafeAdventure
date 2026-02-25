@@ -448,8 +448,10 @@ class CyberSafeGame:
                                 self.game_paused = False
                                 self.player.invincible = True
                                 self.player.invincible_timer = 120  # 2 seconds
+                                # Trigger a visual light/glow effect on the player
+                                if hasattr(self.player, "start_glow"):
+                                    self.player.start_glow()
                             else:
-
                                 self.trivia_active = False
                                 self.game_paused = False
                                 damage_amount = 15
@@ -716,21 +718,14 @@ class CyberSafeGame:
             pygame.display.flip()
             return
 
-        base_color = (30, 30, 60)
-        if self.current_level == 2:
-            base_color = (30, 60, 30)
-        elif self.current_level == 3:
-            base_color = (50, 20, 50)
-        elif self.current_level == 4:
-            base_color = (60, 30, 20)
-        elif self.current_level == 5:
-            base_color = (20, 20, 20)
-
+        # Consistently dark background across all levels
+        base_color = BLACK
         for y in range(SCREEN_HEIGHT):
             color_ratio = y / SCREEN_HEIGHT
-            r = int(base_color[0] + color_ratio * 20)
-            g = int(base_color[1] + color_ratio * 20)
-            b = int(base_color[2] + color_ratio * 20)
+            # Subtle vertical gradient
+            r = min(255, int(base_color[0] + color_ratio * 15))
+            g = min(255, int(base_color[1] + color_ratio * 15))
+            b = min(255, int(base_color[2] + color_ratio * 15))
             pygame.draw.line(self.screen, (r, g, b), (0, y), (SCREEN_WIDTH, y))
 
         if not self.game_over:
@@ -744,6 +739,17 @@ class CyberSafeGame:
                 temp_sprites.draw(self.screen)
             else:
                 self.all_sprites.draw(self.screen)
+
+            # Draw player light effect if glow_timer > 0
+            if self.player.glow_timer > 0:
+                glow_surface = pygame.Surface((self.player.width + 40, self.player.height + 40), pygame.SRCALPHA)
+                alpha = int(150 * (self.player.glow_timer / 120))
+                # Draw several layered circles for a soft glow
+                for radius in range(30, 10, -5):
+                    layer_alpha = int(alpha * (1 - radius / 30))
+                    pygame.draw.circle(glow_surface, (255, 255, 255, layer_alpha), 
+                                       (self.player.width // 2 + 20, self.player.height // 2 + 20), radius + 10)
+                self.screen.blit(glow_surface, (self.player.rect.x - 20, self.player.rect.y - 20))
 
             self.ui.draw_health_bar(self.screen, 10, 80, 200, 20,
                                     self.player.health, self.player.max_health)
