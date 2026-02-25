@@ -170,12 +170,19 @@ async def custom_site():
     if not platform.window.MM.UME:
 
         # now make a prompt
-        fnt = pygame.sysfont.SysFont("freesans",  uy(80) )
+        fnt = pygame.sysfont.SysFont("freesans",  uy(70) )
         prompt = fnt.render("Ready to start !", True, (255, 255, 255))
         prompt_rect = prompt.get_rect()
-        prompt_rect.center = (WIDTH // 2, HEIGHT // 2)
+        prompt_rect.center = (WIDTH // 2, HEIGHT // 2 - uy(15))
+        
+        fnt2 = pygame.sysfont.SysFont("freesans",  uy(30) )
+        prompt2 = fnt2.render("press it to start", True, (255, 255, 255))
+        prompt2_rect = prompt2.get_rect()
+        prompt2_rect.center = (WIDTH // 2, HEIGHT // 2 + uy(30))
+        
         pg_bar(track.len)
         screen.blit(prompt, prompt_rect)
+        screen.blit(prompt2, prompt2_rect)
         compose()
         print("""
         * Waiting for media user engagement : please click/touch page *
