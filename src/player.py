@@ -1,6 +1,7 @@
 import pygame
 from constants import *
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -14,45 +15,45 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        
+
         self.velocity_x = 0
         self.velocity_y = 0
         self.on_ground = False
         self.jump_buffer = 0
         self.facing_left = False
-        
+
         self.health = 100
         self.max_health = 100
         self.invincible = False
         self.invincible_timer = 0
-        
+
     def update(self, platforms):
         if self.jump_buffer > 0:
             self.jump_buffer -= 1
-        
+
         if self.invincible_timer > 0:
             self.invincible_timer -= 1
             if self.invincible_timer == 0:
                 self.invincible = False
-        
+
         if not self.on_ground:
             self.velocity_y += GRAVITY
-        
+
         self.rect.x += self.velocity_x
-        
+
         self.check_platform_collisions(platforms, horizontal=True)
-        
+
         self.rect.y += self.velocity_y
         was_on_ground = self.on_ground
         self.on_ground = False
-        
+
         self.check_platform_collisions(platforms, horizontal=False)
-        
+
         self.check_ground(platforms)
-        
+
         if was_on_ground and not self.on_ground and self.velocity_y >= 0:
             self.jump_buffer = 5  # 5 frames of jump buffer
-        
+
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > SCREEN_WIDTH:
@@ -63,7 +64,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
             self.on_ground = True
             self.velocity_y = 0
-    
+
     def check_platform_collisions(self, platforms, horizontal):
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
@@ -78,15 +79,15 @@ class Player(pygame.sprite.Sprite):
                         self.on_ground = True
                         self.velocity_y = 0
                         if hasattr(platform, 'direction'):
-                             if platform.axis == 'x':
-                                 self.rect.x += platform.speed * platform.direction
-                             elif platform.axis == 'y':
-                                 self.rect.y += platform.speed * platform.direction
-                                 
+                            if platform.axis == 'x':
+                                self.rect.x += platform.speed * platform.direction
+                            elif platform.axis == 'y':
+                                self.rect.y += platform.speed * platform.direction
+
                     elif self.velocity_y < 0:  # Jumping
                         self.rect.top = platform.rect.bottom
                         self.velocity_y = 0
-    
+
     def check_ground(self, platforms):
         ground_check = pygame.Rect(self.rect.left, self.rect.bottom, self.rect.width, GROUND_TOLERANCE)
         for platform in platforms:
@@ -96,24 +97,24 @@ class Player(pygame.sprite.Sprite):
                     if self.velocity_y > 0:
                         self.velocity_y = 0
                     break
-    
+
     def jump(self):
         if self.on_ground or self.jump_buffer > 0:
             self.velocity_y = PLAYER_JUMP_STRENGTH
             self.on_ground = False
             self.jump_buffer = 0
-    
+
     def move_left(self):
         self.velocity_x = -PLAYER_SPEED
         self.facing_left = True
-    
+
     def move_right(self):
         self.velocity_x = PLAYER_SPEED
         self.facing_left = False
-    
+
     def stop(self):
         self.velocity_x = 0
-    
+
     def take_damage(self, amount):
         if not self.invincible:
             self.health -= amount
@@ -121,7 +122,7 @@ class Player(pygame.sprite.Sprite):
                 self.health = 0
             self.invincible = True
             self.invincible_timer = 60
-    
+
     def heal(self, amount):
         self.health += amount
         if self.health > self.max_health:

@@ -2,6 +2,7 @@ import pygame
 import random
 from constants import *
 
+
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -14,6 +15,7 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+
 class MovingPlatform(Platform):
     def __init__(self, x, y, width, height, dist, axis='x', speed=2):
         super().__init__(x, y, width, height)
@@ -22,10 +24,10 @@ class MovingPlatform(Platform):
         self.axis = axis
         self.speed = speed
         self.direction = 1
-        
+
         # Distinct look for moving platforms (Yellowish border)
         pygame.draw.rect(self.image, YELLOW, (0, 0, width, height), 2)
-    
+
     def update(self):
         if self.axis == 'x':
             self.rect.x += self.speed * self.direction
@@ -35,6 +37,7 @@ class MovingPlatform(Platform):
             self.rect.y += self.speed * self.direction
             if abs(self.rect.y - self.start_pos) > self.dist:
                 self.direction *= -1
+
 
 class QuestionBlock(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -47,7 +50,7 @@ class QuestionBlock(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, GRAY, (0, 0, self.width, self.height), 2)
         font = pygame.font.Font(None, 28)
         text_surf = font.render("?", True, BLACK)
-        text_rect = text_surf.get_rect(center=(self.width//2, self.height//2))
+        text_rect = text_surf.get_rect(center=(self.width // 2, self.height // 2))
         self.image.blit(text_surf, text_rect)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -72,12 +75,13 @@ class QuestionBlock(pygame.sprite.Sprite):
         except Exception:
             pass
 
+
 class Level:
     def __init__(self, level_num):
         self.level_num = level_num
         self.platforms = pygame.sprite.Group()
         self.create_level()
-        
+
         self.messages = {
             1: "Level 1: Avoid suspicious links and viruses!",
             2: "Level 2: Don't share personal information with strangers!",
@@ -85,65 +89,65 @@ class Level:
             4: "Level 4: Be careful with downloads and attachments!",
             5: "Level 5: Final Challenge - Use all your knowledge!"
         }
-        
+
     def create_level(self):
         self.platforms.add(Platform(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50))
-        
+
         if self.level_num == 1:
 
             self.platforms.add(Platform(50, 600, 180, 20))
             self.platforms.add(Platform(350, 600, 180, 20))
             self.platforms.add(Platform(700, 600, 180, 20))
-            
+
             self.platforms.add(Platform(200, 500, 160, 20))
             self.platforms.add(Platform(550, 500, 160, 20))
-            
+
             self.platforms.add(Platform(50, 400, 140, 20))
             self.platforms.add(Platform(400, 350, 140, 20))
             self.platforms.add(Platform(750, 400, 140, 20))
-            
+
         elif self.level_num == 2:
 
             self.platforms.add(Platform(50, 550, 150, 20))
-            
+
             self.platforms.add(Platform(350, 400, 150, 20))
-            
+
             self.platforms.add(Platform(650, 500, 150, 20))
-            
+
             # Moving Bridge!
-            self.platforms.add(MovingPlatform(220, 480, 80, 20, 100, 'x', 2)) 
-            
+            self.platforms.add(MovingPlatform(220, 480, 80, 20, 100, 'x', 2))
+
             self.platforms.add(Platform(270, 620, 60, 20))
             self.platforms.add(Platform(530, 620, 60, 20))
             self.platforms.add(Platform(240, 320, 50, 20))
             self.platforms.add(Platform(530, 320, 50, 20))
             self.platforms.add(MovingPlatform(820, 350, 60, 20, 80, 'y', 1))
-            
+
         elif self.level_num == 3:
             self.platforms.add(Platform(100, 600, 150, 20))
             self.platforms.add(Platform(300, 500, 150, 20))
             self.platforms.add(Platform(500, 400, 150, 20))
             self.platforms.add(Platform(700, 300, 150, 20))
-            
+
             self.platforms.add(MovingPlatform(900, 200, 80, 20, 100, 'y', 2))
             self.platforms.add(Platform(600, 150, 80, 20))
             self.platforms.add(Platform(300, 150, 80, 20))
-            
+
             self.platforms.add(MovingPlatform(600, 600, 80, 20, 150, 'x', 3))
             self.platforms.add(Platform(900, 500, 80, 20))
-            
+
         elif self.level_num == 4:
 
             self.platforms.add(Platform(50, 600, 140, 20))
             self.platforms.add(Platform(200, 500, 140, 20))
-            
+
             self.platforms.add(MovingPlatform(350, 400, 120, 20, 100, 'x', 2))
             self.platforms.add(Platform(500, 350, 100, 20))
             self.platforms.add(MovingPlatform(650, 400, 120, 20, 100, 'x', 2))
-            
+
             self.platforms.add(Platform(800, 500, 140, 20))
             self.platforms.add(Platform(950, 600, 140, 20))
-            
+
             self.platforms.add(Platform(500, 200, 160, 20))
             self.platforms.add(Platform(100, 300, 100, 20))
             self.platforms.add(Platform(900, 300, 100, 20))
@@ -153,18 +157,18 @@ class Level:
             self.platforms.add(Platform(50, 650, 300, 20))
             self.platforms.add(Platform(450, 650, 300, 20))
             self.platforms.add(Platform(850, 650, 300, 20))
-            
+
             self.platforms.add(MovingPlatform(350, 500, 150, 20, 100, 'x', 2))
             self.platforms.add(MovingPlatform(700, 500, 150, 20, 100, 'x', 2))
-            
+
             self.platforms.add(Platform(100, 350, 250, 20))
             self.platforms.add(Platform(850, 350, 250, 20))
-            
+
             self.platforms.add(Platform(500, 250, 200, 20))  # Central safe hub
-            
-            self.platforms.add(Platform(50, 200, 100, 20))   # Top Left
-            self.platforms.add(Platform(1050, 200, 100, 20)) # Top Right
-            
+
+            self.platforms.add(Platform(50, 200, 100, 20))  # Top Left
+            self.platforms.add(Platform(1050, 200, 100, 20))  # Top Right
+
             self.platforms.add(Platform(300, 150, 100, 20))  # High Left
             self.platforms.add(Platform(800, 150, 100, 20))  # High Right
 
@@ -175,7 +179,7 @@ class Level:
                 (340, 50),
                 (840, 50)
             ]
-        
+
         if self.level_num != 5:
             self.apply_variations()
 

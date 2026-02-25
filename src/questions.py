@@ -1,4 +1,3 @@
-
 TRIVIA_QUESTIONS = [
     {
         "question": "What should you do if you receive an email from an unknown sender asking for your password?",

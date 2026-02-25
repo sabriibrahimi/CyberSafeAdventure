@@ -211,8 +211,6 @@ class UI:
         box_x = (SCREEN_WIDTH - box_width) // 2
         box_y = (SCREEN_HEIGHT - box_height) // 2
 
-
-
         title_text = info['title']
         title_width = self.font_large.size(title_text)[0]
         self.draw_text(screen, title_text, box_x + (box_width - title_width) // 2, box_y + 30,
@@ -286,8 +284,6 @@ class UI:
         box_height = 500
         box_x = (SCREEN_WIDTH - box_width) // 2
         box_y = (SCREEN_HEIGHT - box_height) // 2
-
-
 
         preview_size = 60
         preview_x = box_x + box_width - 100
@@ -374,98 +370,106 @@ class UI:
         box_x = (SCREEN_WIDTH - box_width) // 2
         box_y = (SCREEN_HEIGHT - box_height) // 2
 
-
         y_offset = 20
         if enemy_type:
             warn_color = RED
             warn_text = f"You touched a {enemy_type.upper()}!"
-            if enemy_type == "phishing": warn_color = BLUE
-            elif enemy_type == "malware": warn_color = GREEN
-            elif enemy_type == "stranger": warn_color = PURPLE
-            
+            if enemy_type == "phishing":
+                warn_color = BLUE
+            elif enemy_type == "malware":
+                warn_color = GREEN
+            elif enemy_type == "stranger":
+                warn_color = PURPLE
+
             warn_width = self.font_large.size(warn_text)[0]
-            self.draw_text(screen, warn_text, box_x + (box_width - warn_width)//2, box_y + y_offset, self.font_large, warn_color)
-            
+            self.draw_text(screen, warn_text, box_x + (box_width - warn_width) // 2, box_y + y_offset, self.font_large,
+                           warn_color)
+
             y_offset += 50
             sub_text = "Answer correctly to defend yourself!"
             sub_width = self.font_small.size(sub_text)[0]
-            self.draw_text(screen, sub_text, box_x + (box_width - sub_width)//2, box_y + y_offset, self.font_small, WHITE)
+            self.draw_text(screen, sub_text, box_x + (box_width - sub_width) // 2, box_y + y_offset, self.font_small,
+                           WHITE)
             y_offset += 40
         else:
-            self.draw_text(screen, "CYBER SAFETY QUIZ", box_x + box_width//2 - 100, box_y + y_offset, self.font_large, CYAN)
+            self.draw_text(screen, "CYBER SAFETY QUIZ", box_x + box_width // 2 - 100, box_y + y_offset, self.font_large,
+                           CYAN)
             y_offset += 60
-        
+
         question_lines = self.wrap_text(question_data["question"], box_width - 40, self.font_medium)
         for i, line in enumerate(question_lines):
-            self.draw_text(screen, line, box_x + 20, box_y + y_offset + i*30, self.font_medium, WHITE)
+            self.draw_text(screen, line, box_x + 20, box_y + y_offset + i * 30, self.font_medium, WHITE)
 
-        option_start_y = box_y + y_offset + len(question_lines)*30 + 30
+        option_start_y = box_y + y_offset + len(question_lines) * 30 + 30
         option_rects = []
-        
+
         labels = ["a", "b", "c"]
         for i, option in enumerate(question_data["options"]):
             color = WHITE
             if i == selected_option:
                 color = YELLOW
-            
+
             option_text = f"{labels[i]}) {option}"
             y_pos = option_start_y + i * 80
-            
+
             if i == selected_option:
                 pygame.draw.rect(screen, (50, 50, 100), (box_x + 10, y_pos - 10, box_width - 20, 60))
                 pygame.draw.rect(screen, BLUE, (box_x + 10, y_pos - 10, box_width - 20, 60), 2)
-            
+
             self.draw_text(screen, option_text, box_x + 20, y_pos, self.font_small, color)
-            
+
             rect = pygame.Rect(box_x + 10, y_pos - 10, box_width - 20, 60)
             option_rects.append(rect)
-            
-        self.draw_text(screen, "Select answer with UP/DOWN keys and press ENTER", box_x + 20, box_y + box_height - 40, self.font_small, GRAY)
-        
+
+        self.draw_text(screen, "Select answer with UP/DOWN keys and press ENTER", box_x + 20, box_y + box_height - 40,
+                       self.font_small, GRAY)
+
         return option_rects
 
     def draw_main_menu(self, screen):
         screen.fill(BLACK)
-        
+
         title_text = "CYBER SAFE ADVENTURE"
         title_width = self.font_huge.size(title_text)[0]
         self.draw_text(screen, title_text, (SCREEN_WIDTH - title_width) // 2, 150, self.font_huge, CYAN)
-        
+
         subtitle_text = "Learn to navigate the internet safely!"
         subtitle_width = self.font_medium.size(subtitle_text)[0]
         self.draw_text(screen, subtitle_text, (SCREEN_WIDTH - subtitle_width) // 2, 220, self.font_medium, WHITE)
-        
+
         button_width = 300
         button_height = 60
         start_x = (SCREEN_WIDTH - button_width) // 2
         start_y = 350
         tips_y = 450
-        
+
         start_rect = pygame.Rect(start_x, start_y, button_width, button_height)
         pygame.draw.rect(screen, GREEN, start_rect)
         pygame.draw.rect(screen, WHITE, start_rect, 3)
-        
+
         start_text = "START GAME"
         text_width = self.font_large.size(start_text)[0]
-        self.draw_text(screen, start_text, start_x + (button_width - text_width) // 2, start_y + 15, self.font_large, BLACK)
-        
+        self.draw_text(screen, start_text, start_x + (button_width - text_width) // 2, start_y + 15, self.font_large,
+                       BLACK)
+
         tips_rect = pygame.Rect(start_x, tips_y, button_width, button_height)
         pygame.draw.rect(screen, BLUE, tips_rect)
         pygame.draw.rect(screen, WHITE, tips_rect, 3)
-        
+
         tips_text = "HOW TO PLAY & TIPS"
         text_width = self.font_medium.size(tips_text)[0]
-        self.draw_text(screen, tips_text, start_x + (button_width - text_width) // 2, tips_y + 18, self.font_medium, BLACK)
-        
+        self.draw_text(screen, tips_text, start_x + (button_width - text_width) // 2, tips_y + 18, self.font_medium,
+                       BLACK)
+
         return {'start': start_rect, 'tips': tips_rect}
 
     def draw_tips_screen(self, screen):
         screen.fill(BLACK)
-        
+
         title_text = "GAME GUIDE & LEARNING GOALS"
         title_width = self.font_large.size(title_text)[0]
         self.draw_text(screen, title_text, (SCREEN_WIDTH - title_width) // 2, 50, self.font_large, YELLOW)
-        
+
         content = [
             ("GOAL OF THE GAME:", YELLOW),
             ("Navigate through 5 levels representing different aspects of internet safety.", WHITE),
@@ -483,7 +487,7 @@ class UI:
             ("4. Identifying dangerous downloads and attachments.", WHITE),
             ("5. Fighting back against cyber threats with knowledge!", WHITE)
         ]
-        
+
         start_y = 120
         for text, color in content:
             if text == "":
@@ -491,33 +495,33 @@ class UI:
                 continue
             self.draw_text(screen, text, 100, start_y, self.font_medium if color != WHITE else self.font_small, color)
             start_y += 35
-            
+
         back_width = 200
         back_height = 50
         back_x = (SCREEN_WIDTH - back_width) // 2
         back_y = SCREEN_HEIGHT - 100
-        
+
         back_rect = pygame.Rect(back_x, back_y, back_width, back_height)
         pygame.draw.rect(screen, RED, back_rect)
         pygame.draw.rect(screen, WHITE, back_rect, 3)
-        
+
         back_text = "BACK TO MENU"
         text_width = self.font_medium.size(back_text)[0]
         self.draw_text(screen, back_text, back_x + (back_width - text_width) // 2, back_y + 12, self.font_medium, BLACK)
-        
+
         return {'back': back_rect}
 
     def draw_password_challenge(self, screen, input_text, feedback_text, strength_level):
         screen.fill((10, 10, 20))
-        
+
         title_text = "LEVEL 1 SECURITY CHECK"
         title_width = self.font_huge.size(title_text)[0]
         self.draw_text(screen, title_text, (SCREEN_WIDTH - title_width) // 2, 40, self.font_huge, GREEN)
-        
+
         panel_rect = pygame.Rect(100, 100, SCREEN_WIDTH - 200, 280)
         pygame.draw.rect(screen, (30, 30, 40), panel_rect, border_radius=10)
         pygame.draw.rect(screen, CYAN, panel_rect, 2, border_radius=10)
-        
+
         info_lines = [
             ("PASSWORD SECURITY TRAINING", CYAN),
             ("", WHITE),
@@ -527,94 +531,98 @@ class UI:
             ("", WHITE),
             ("MISSION: Create a STRONG password (8+ chars, mix case, numbers, symbols)", YELLOW)
         ]
-        
+
         start_y = 120
         for text, color in info_lines:
             text_width = self.font_medium.size(text)[0]
             self.draw_text(screen, text, (SCREEN_WIDTH - text_width) // 2, start_y, self.font_medium, color)
             start_y += 35
-            
+
         input_box_width = 500
         input_box_height = 60
         input_x = (SCREEN_WIDTH - input_box_width) // 2
         input_y = 420
-        
+
         border_color = WHITE
         status_icon = "..."
-        if strength_level == "STRONG": 
+        if strength_level == "STRONG":
             border_color = GREEN
             status_icon = "✔ SECURE"
-        elif strength_level == "MEDIUM": 
+        elif strength_level == "MEDIUM":
             border_color = ORANGE
             status_icon = "⚠ WEAK"
-        elif strength_level == "WEAK": 
+        elif strength_level == "WEAK":
             border_color = RED
             status_icon = "❌ VULNERABLE"
-            
+
         pygame.draw.rect(screen, (0, 0, 0), (input_x, input_y, input_box_width, input_box_height))
         pygame.draw.rect(screen, border_color, (input_x, input_y, input_box_width, input_box_height), 3)
-        
+
         text_surface = self.font_large.render(input_text, True, WHITE)
         screen.blit(text_surface, (input_x + 15, input_y + 12))
-        
+
         if (pygame.time.get_ticks() // 500) % 2 == 0:
             cursor_x = input_x + 15 + text_surface.get_width()
             pygame.draw.line(screen, WHITE, (cursor_x, input_y + 10), (cursor_x, input_y + 50), 2)
-        
+
         if feedback_text:
             feed_text = f"ANALYSIS: {feedback_text}"
             feed_width = self.font_medium.size(feed_text)[0]
-            
+
             feed_color = WHITE
-            if strength_level == "WEAK": feed_color = RED
-            elif strength_level == "MEDIUM": feed_color = ORANGE
-            elif strength_level == "STRONG": feed_color = GREEN
-            
-            self.draw_text(screen, feed_text, (SCREEN_WIDTH - feed_width) // 2, input_y + 80, self.font_medium, feed_color)
-            
+            if strength_level == "WEAK":
+                feed_color = RED
+            elif strength_level == "MEDIUM":
+                feed_color = ORANGE
+            elif strength_level == "STRONG":
+                feed_color = GREEN
+
+            self.draw_text(screen, feed_text, (SCREEN_WIDTH - feed_width) // 2, input_y + 80, self.font_medium,
+                           feed_color)
+
         strength_text = f"STATUS: {status_icon}"
         strength_width = self.font_medium.size(strength_text)[0]
-        self.draw_text(screen, strength_text, (SCREEN_WIDTH - strength_width) // 2, input_y - 40, self.font_medium, border_color)
+        self.draw_text(screen, strength_text, (SCREEN_WIDTH - strength_width) // 2, input_y - 40, self.font_medium,
+                       border_color)
 
         if strength_level == "STRONG":
             cont_text = "ACCESS GRANTED - PRESS ENTER TO PROCEED"
             cont_bg = pygame.Rect(0, 550, SCREEN_WIDTH, 50)
             pygame.draw.rect(screen, (0, 50, 0), cont_bg)
-            
+
             cont_width = self.font_large.size(cont_text)[0]
             self.draw_text(screen, cont_text, (SCREEN_WIDTH - cont_width) // 2, 560, self.font_large, GREEN)
 
     def draw_email_sorting(self, screen, email_data, progress, feedback):
         screen.fill((20, 20, 30))
-        
+
         title = "INBOX CLEANER: SORT THE EMAILS"
         title_w = self.font_large.size(title)[0]
-        self.draw_text(screen, title, (SCREEN_WIDTH - title_w)//2, 50, self.font_large, CYAN)
-        
+        self.draw_text(screen, title, (SCREEN_WIDTH - title_w) // 2, 50, self.font_large, CYAN)
+
         card_w, card_h = 600, 350
         card_x = (SCREEN_WIDTH - card_w) // 2
         card_y = 150
-        
+
         pygame.draw.rect(screen, WHITE, (card_x, card_y, card_w, card_h), border_radius=15)
         pygame.draw.rect(screen, LIGHT_GRAY, (card_x, card_y, card_w, 60), border_radius=15)
-        pygame.draw.rect(screen, LIGHT_GRAY, (card_x, card_y+30, card_w, 30)) # Fill rounded corners bottom
-        
+        pygame.draw.rect(screen, LIGHT_GRAY, (card_x, card_y + 30, card_w, 30))  # Fill rounded corners bottom
+
         self.draw_text(screen, f"FROM: {email_data['sender']}", card_x + 20, card_y + 15, self.font_medium, BLACK)
         self.draw_text(screen, f"SUBJECT:", card_x + 20, card_y + 80, self.font_small, GRAY)
         self.draw_text(screen, f"{email_data['subject']}", card_x + 20, card_y + 110, self.font_large, BLACK)
-        
-        pygame.draw.circle(screen, RED, (card_x - 60, card_y + card_h//2), 40)
-        self.draw_text(screen, "<", card_x - 70, card_y + card_h//2 - 15, self.font_large, WHITE)
-        self.draw_text(screen, "PHISHING", card_x - 90, card_y + card_h//2 + 50, self.font_small, RED)
-        
-        pygame.draw.circle(screen, GREEN, (card_x + card_w + 60, card_y + card_h//2), 40)
-        self.draw_text(screen, ">", card_x + card_w + 50, card_y + card_h//2 - 15, self.font_large, WHITE)
-        self.draw_text(screen, "SAFE", card_x + card_w + 40, card_y + card_h//2 + 50, self.font_small, GREEN)
-        
-    
-        self.draw_text(screen, f"EMAILS LEFT: {progress}", (SCREEN_WIDTH - 200)//2, 550, self.font_medium, WHITE)
-        
+
+        pygame.draw.circle(screen, RED, (card_x - 60, card_y + card_h // 2), 40)
+        self.draw_text(screen, "<", card_x - 70, card_y + card_h // 2 - 15, self.font_large, WHITE)
+        self.draw_text(screen, "PHISHING", card_x - 90, card_y + card_h // 2 + 50, self.font_small, RED)
+
+        pygame.draw.circle(screen, GREEN, (card_x + card_w + 60, card_y + card_h // 2), 40)
+        self.draw_text(screen, ">", card_x + card_w + 50, card_y + card_h // 2 - 15, self.font_large, WHITE)
+        self.draw_text(screen, "SAFE", card_x + card_w + 40, card_y + card_h // 2 + 50, self.font_small, GREEN)
+
+        self.draw_text(screen, f"EMAILS LEFT: {progress}", (SCREEN_WIDTH - 200) // 2, 550, self.font_medium, WHITE)
+
         if feedback:
             color = GREEN if feedback == "CORRECT!" else RED
             fb_w = self.font_huge.size(feedback)[0]
-            self.draw_text(screen, feedback, (SCREEN_WIDTH - fb_w)//2, card_y + card_h - 60, self.font_huge, color)
+            self.draw_text(screen, feedback, (SCREEN_WIDTH - fb_w) // 2, card_y + card_h - 60, self.font_huge, color)
