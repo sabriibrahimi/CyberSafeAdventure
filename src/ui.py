@@ -452,13 +452,13 @@ class UI:
                        BLACK)
 
         tips_rect = pygame.Rect(start_x, tips_y, button_width, button_height)
-        pygame.draw.rect(screen, BLUE, tips_rect)
+        pygame.draw.rect(screen, BLACK, tips_rect)
         pygame.draw.rect(screen, WHITE, tips_rect, 3)
 
         tips_text = "HOW TO PLAY & TIPS"
         text_width = self.font_medium.size(tips_text)[0]
         self.draw_text(screen, tips_text, start_x + (button_width - text_width) // 2, tips_y + 18, self.font_medium,
-                       BLACK)
+                       WHITE)
 
         return {'start': start_rect, 'tips': tips_rect}
 
