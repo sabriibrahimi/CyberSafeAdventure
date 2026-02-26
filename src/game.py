@@ -363,11 +363,10 @@ class CyberSafeGame:
                         elif 'tips' in self.menu_buttons and self.menu_buttons['tips'].collidepoint(mouse_pos):
                             self.in_menu = False
                             self.in_tips = True
-
+                    elif self.in_tips:
+                        if 'back' in self.menu_buttons and self.menu_buttons['back'].collidepoint(mouse_pos):
                             self.in_tips = False
                             self.in_menu = True
-
-                            self.check_password_strength()
                 continue
 
             if self.in_email_sorting:
