@@ -168,19 +168,18 @@ async def custom_site():
 
     # test/wait if user media interaction required
     if not platform.window.MM.UME:
-        # Custom start prompt
-        fnt = pygame.sysfont.SysFont("freesans",  uy(60) )
+        # Custom start prompt inside the progress bar
+        fnt = pygame.sysfont.SysFont("freesans",  uy(45) )
         prompt = fnt.render("Ready to start !", True, "white")
         pg_bar(track.len)
         
-        # Center horizontally and place above progress bar
-        prompt_rect = prompt.get_rect(center=(WIDTH // 2, marginy - uy(60)))
+        # Center inside the green bar (marginy is the top, uy(90) is height)
+        prompt_rect = prompt.get_rect(center=(WIDTH // 2, marginy + uy(25)))
         screen.blit(prompt, prompt_rect)
         
-        fnt_small = pygame.sysfont.SysFont("freesans", uy(40))
+        fnt_small = pygame.sysfont.SysFont("freesans", uy(30))
         prompt_small = fnt_small.render("press it to start", True, "white")
-        # Center horizontally and place below progress bar
-        small_rect = prompt_small.get_rect(center=(WIDTH // 2, marginy + uy(120)))
+        small_rect = prompt_small.get_rect(center=(WIDTH // 2, marginy + uy(65)))
         screen.blit(prompt_small, small_rect)
         compose()
         print("""
